@@ -24,8 +24,17 @@ new_instances = ec2.create_instances(
     UserData="""#!/bin/bash
             yum install httpd -y
             systemctl enable httpd
-            systemctl start httpd"""
+            systemctl start httpd
+            echo '<html>' > index.html
+            echo 'Private IP address: ' >> index.html
+            TOKEN=`curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"`
+            curl -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/local-ipv4 >> index.html
+            cp index.html /var/www/html/index.html"""
     )
 
 print ("ID: ", new_instances[0].id)
 print ("Name: ", new_instances[0].tags[0]['Value'])
+print ("IP Address: ", new_instances[0].public_ip_address)
+
+for inst in ec2.instances.all():
+    print(inst.id, inst.state, inst.instance_type, inst.public_ip_address)
