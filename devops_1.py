@@ -1,4 +1,5 @@
 import boto3
+import time
 
 ec2 = boto3.resource('ec2')
 new_instances = ec2.create_instances(
@@ -32,9 +33,17 @@ new_instances = ec2.create_instances(
             cp index.html /var/www/html/index.html"""
     )
 
+time.sleep(3) # Sleep for 3 seconds
+
+print ("Created new EC2 instances:")
 print ("ID: ", new_instances[0].id)
 print ("Name: ", new_instances[0].tags[0]['Value'])
-print ("IP Address: ", new_instances[0].public_ip_address)
+#print ("IP Address: ", new_instances[0].public_ip_address)
 
-for inst in ec2.instances.all():
-    print(inst.id, inst.state, inst.instance_type, inst.public_ip_address)
+#for inst in ec2.instances.all():
+#    print(inst.id, inst.state, inst.instance_type, inst.public_ip_address)
+
+
+inst = ec2.Instance(new_instances[0].id)
+print("TEST", inst.id, inst.state, inst.instance_type, inst.public_ip_address)
+print("http://"+inst.public_ip_address)
